@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>plantamuerta.art — Catálogo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#FAF6F0;--beige:#F0E8DC;--tan:#D9C9B4;
+  --terrac:#B85C38;--terrac2:#8C3D22;--terrac-light:#FEF3ED;
+  --ink:#2A1F1A;--muted:#7A6A5E;--border:#D4C4B0;--white:#fff;
+  --obsidian:#1A1A2E;--obsidian2:#121220;
+  --good:#2E6B40;--good-bg:#EDF7F0;
+  --warn:#7A5200;--warn-bg:#FFF8E7;
+  --bad:#8C1A1A;--bad-bg:#FEF0F0;
+  --sage:#7A9E7E;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+
+/* HEADER */
+header{background:var(--obsidian);padding:1.4rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.hdr-brand .domain{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--terrac);display:block;margin-bottom:.25rem}
+.hdr-brand h1{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:400;color:var(--white);line-height:1}
+.hdr-brand h1 span{color:var(--terrac)}
+.hdr-stats{display:flex;gap:1.25rem}
+.hstat{text-align:center}
+.hstat-n{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--white);line-height:1}
+.hstat-l{font-size:9px;color:rgba(217,201,180,.5);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.hstat-n.ok{color:#9FE1CB}.hstat-n.res{color:#FAC775}.hstat-n.sold{color:#F09595}
+
+/* TOOLBAR */
+.toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:.65rem 1.4rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:sticky;top:0;z-index:50}
+.search-wrap{flex:1;min-width:160px;position:relative}
+.search-wrap input{width:100%;padding:7px 10px 7px 32px;border:1px solid var(--border);border-radius:6px;background:var(--cream);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none}
+.search-wrap input:focus{border-color:var(--terrac)}
+.search-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
+select.filt{padding:7px 9px;border:1px solid var(--border);border-radius:6px;background:var(--cream);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;cursor:pointer}
+select.filt:focus{border-color:var(--terrac)}
+.btn-add{display:flex;align-items:center;gap:5px;padding:7px 15px;background:var(--terrac);color:var(--white);border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .2s}
+.btn-add:hover{background:var(--terrac2)}
+.view-toggle{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.vt-btn{padding:6px 10px;border:none;background:transparent;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s}
+.vt-btn.active{background:var(--beige);color:var(--ink)}
+
+/* MAIN */
+main{padding:1.25rem;max-width:1200px;margin:0 auto}
+
+/* GRID */
+.grid-view{display:none}.grid-view.active{display:grid}
+.grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.prod-card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform .15s,box-shadow .15s;cursor:pointer}
+.prod-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(42,31,26,.1)}
+.card-img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--obsidian);display:flex;align-items:center;justify-content:center;font-size:2.5rem;position:relative}
+.card-img img{width:100%;height:100%;object-fit:cover}
+.card-img .cat-ico{font-size:2.5rem;opacity:.3}
+.card-body{padding:.85rem 1rem}
+.card-id{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.card-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:3px;line-height:1.2}
+.card-cat{font-size:11px;color:var(--muted);margin-bottom:7px}
+.card-footer{display:flex;align-items:center;justify-content:space-between}
+.card-price{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--terrac2)}
+.sbadge{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500}
+.s-disp{background:var(--good-bg);color:var(--good)}
+.s-res{background:var(--warn-bg);color:var(--warn)}
+.s-vend{background:var(--bad-bg);color:var(--bad)}
+.card-actions{display:flex;gap:5px;margin-top:.55rem}
+.act-btn{flex:1;padding:5px;border:1px solid var(--border);border-radius:4px;background:transparent;font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;color:var(--muted);transition:all .15s}
+.act-btn:hover{background:var(--beige);color:var(--ink)}
+.act-btn.del:hover{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+
+/* LIST */
+.list-view{display:none}.list-view.active{display:block}
+.list-tbl{width:100%;border-collapse:collapse;background:var(--white);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.list-tbl th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--border);background:var(--beige);font-weight:500}
+.list-tbl td{padding:9px 12px;border-bottom:1px solid var(--beige);font-size:12px;vertical-align:middle}
+.list-tbl tr:last-child td{border-bottom:none}
+.list-tbl tr:hover td{background:var(--cream)}
+.list-thumb{width:40px;height:40px;border-radius:6px;overflow:hidden;background:var(--obsidian);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.list-thumb img{width:100%;height:100%;object-fit:cover}
+
+/* EMPTY */
+.empty{text-align:center;padding:4rem 2rem;color:var(--muted);grid-column:1/-1}
+.empty-ico{font-size:2.5rem;margin-bottom:.75rem;opacity:.3}
+.empty h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--ink);margin-bottom:.4rem}
+.empty p{font-size:13px;line-height:1.6}
+
+/* OVERLAY */
+.overlay{position:fixed;inset:0;background:rgba(26,26,46,.65);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
+.overlay.open{display:flex}
+.modal{background:var(--white);border-radius:14px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-hdr{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1;border-radius:14px 14px 0 0}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600}
+.modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted);padding:4px}
+.modal-body{padding:1.2rem 1.4rem}
+.modal-footer{padding:.9rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--white)}
+
+/* FORM */
+.fg{margin-bottom:.8rem}
+.fg label{display:block;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:5px;background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--terrac)}
+.fg textarea{resize:vertical;min-height:60px}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+/* IMAGE UPLOAD */
+.img-upload-area{border:2px dashed var(--border);border-radius:8px;padding:1.25rem;text-align:center;cursor:pointer;position:relative;background:var(--cream);transition:all .2s}
+.img-upload-area:hover{border-color:var(--terrac);background:var(--terrac-light)}
+.img-upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-preview{width:100%;height:150px;object-fit:contain;border-radius:6px;margin-bottom:.4rem}
+.img-ico{font-size:1.8rem;opacity:.35;margin-bottom:.4rem}
+.img-txt{font-size:11px;color:var(--muted)}
+
+/* BUTTONS */
+.btn{padding:8px 18px;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.btn-primary{background:var(--terrac);color:var(--white);border-color:var(--terrac)}.btn-primary:hover{background:var(--terrac2)}
+.btn-secondary{background:transparent;color:var(--muted);border-color:var(--border)}.btn-secondary:hover{background:var(--beige);color:var(--ink)}
+.btn-danger{background:var(--bad-bg);color:var(--bad);border-color:var(--bad-border)}.btn-danger:hover{background:#F7C1C1}
+.btn-green{background:var(--good);color:var(--white)}.btn-green:hover{background:#1B5E20}
+.btn-dark{background:var(--obsidian);color:var(--white)}.btn-dark:hover{background:var(--terrac2)}
+
+/* DETAIL */
+.detail-img{width:100%;max-height:260px;object-fit:contain;border-radius:8px;background:var(--obsidian);margin-bottom:1rem}
+.detail-img-ph{width:100%;height:180px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;background:var(--obsidian);border-radius:8px;margin-bottom:1rem;opacity:.5}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.detail-item{background:var(--cream);border-radius:6px;padding:9px 12px}
+.detail-item label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:2px}
+.detail-item span{font-size:13px;font-weight:500;color:var(--ink)}
+.detail-price{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:var(--terrac2)}
+.doc-row{display:flex;gap:8px;margin-top:.75rem;flex-wrap:wrap}
+
+/* DOC MODAL */
+.doc-modal{max-width:480px}
+
+/* PRINT DOCUMENT */
+@media screen{#print-doc{display:none}}
+@media print{body>*{display:none!important}#print-doc{display:block!important}@page{margin:1.5cm}}
+#print-doc{font-family:Arial,sans-serif;color:#1a1a1a;padding:32px;max-width:700px;margin:0 auto}
+.pd-hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #B85C38;padding-bottom:16px;margin-bottom:18px}
+.pd-brand h2{font-family:Georgia,serif;font-size:20px;font-weight:400;color:#1A1A2E;margin:0;letter-spacing:.05em}
+.pd-brand h2 span{color:#B85C38}
+.pd-brand p{font-size:11px;color:#7A6A5E;margin-top:3px;line-height:1.5}
+.pd-tipo-blk{text-align:right}
+.pd-tipo-lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#7A6A5E}
+.pd-tipo-val{font-family:Georgia,serif;font-size:1.4rem;color:#B85C38;line-height:1.1;margin-top:2px}
+.pd-folio{font-size:11px;color:#7A6A5E;margin-top:3px}
+.pd-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#FAF6F0;border-radius:5px;padding:10px 12px;margin-bottom:18px}
+.pd-meta-item label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#7A6A5E;display:block;margin-bottom:1px}
+.pd-meta-item span{font-size:13px;font-weight:500;color:#2A1F1A}
+.pd-tbl{width:100%;border-collapse:collapse;margin-bottom:16px}
+.pd-tbl th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#7A6A5E;padding:6px 8px;border-bottom:2px solid #D4C4B0;font-weight:500}
+.pd-tbl td{padding:7px 8px;border-bottom:1px solid #F0E8DC;font-size:13px}
+.pd-tbl tr:last-child td{border-bottom:none}
+.pd-tbl .nr{text-align:right;font-weight:500}
+.pd-totals{margin-left:auto;width:240px;margin-bottom:14px}
+.pd-tot{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid #F0E8DC}
+.pd-tot:last-child{border-bottom:none;border-top:2px solid #1A1A2E;padding-top:7px;margin-top:3px}
+.pd-tot .tl{color:#7A6A5E}.pd-tot .tv{font-weight:500}
+.pd-tot.grand .tl{font-weight:600;color:#2A1F1A;font-size:14px}
+.pd-tot.grand .tv{color:#B85C38;font-size:15px;font-weight:600}
+.pd-notas{padding:9px 11px;background:#FAF6F0;border-radius:4px;font-size:11px;color:#7A6A5E;border-left:3px solid #B85C38;margin-bottom:18px;line-height:1.55}
+.pd-notas strong{color:#2A1F1A;display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+.pd-footer{text-align:center;font-size:11px;color:#7A6A5E;border-top:1px solid #D4C4B0;padding-top:10px;line-height:1.7}
+.pd-sello-wrap{display:flex;justify-content:flex-end;margin:10px 0}
+.pd-sello{display:inline-block;border:3px solid #2E6B40;border-radius:5px;padding:5px 14px;color:#2E6B40;font-size:13px;font-weight:700;letter-spacing:.1em;transform:rotate(-4deg)}
+
+@media(max-width:600px){
+  .hdr-stats{gap:.75rem}
+  .toolbar{gap:6px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+  .fg2,.fg3{grid-template-columns:1fr}
+  .detail-grid{grid-template-columns:1fr}
+  main{padding:.9rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-brand">
+    <span class="domain">plantamuerta.art</span>
+    <h1>planta<span>muerta</span><span style="color:rgba(184,92,56,.35)">.art</span></h1>
+  </div>
+  <div class="hdr-stats">
+    <div class="hstat"><div class="hstat-n" id="st-total">0</div><div class="hstat-l">Total</div></div>
+    <div class="hstat"><div class="hstat-n ok" id="st-disp">0</div><div class="hstat-l">Disponibles</div></div>
+    <div class="hstat"><div class="hstat-n res" id="st-res">0</div><div class="hstat-l">Reservadas</div></div>
+    <div class="hstat"><div class="hstat-n sold" id="st-vend">0</div><div class="hstat-l">Vendidas</div></div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <span class="search-ico">🔍</span>
+    <input type="text" id="search" placeholder="Buscar por nombre, código, flores..." oninput="render()">
+  </div>
+  <select class="filt" id="filt-cat" onchange="render()">
+    <option value="">Todas las categorías</option>
+    <option>Ataúdes de Resina</option>
+    <option>Separadores de Resina</option>
+    <option>Marcos Arcilla Fría</option>
+    <option>Historias Ilustradas</option>
+    <option>Dijes Florales</option>
+    <option>Set Peine + Espejo</option>
+    <option>Vitrales de Resina</option>
+    <option>Máscaras Arcilla Fría</option>
+  </select>
+  <select class="filt" id="filt-status" onchange="render()">
+    <option value="">Todos los estados</option>
+    <option>Disponible</option>
+    <option>Reservado</option>
+    <option>Vendido</option>
+  </select>
+  <div class="view-toggle">
+    <button class="vt-btn active" id="vt-g" onclick="setView('grid')" title="Cuadrícula">⊞</button>
+    <button class="vt-btn" id="vt-l" onclick="setView('list')" title="Lista">☰</button>
+  </div>
+  <button class="btn-add" onclick="openForm()">+ Agregar</button>
+</div>
+
+<main>
+  <div class="grid-view grid active" id="grid-ct"></div>
+  <div class="list-view" id="list-ct"></div>
+</main>
+
+<!-- MODAL: FORMULARIO -->
+<div class="overlay" id="form-overlay">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title" id="form-title">Agregar producto</span>
+      <button class="modal-close" onclick="closeForm()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label>Foto del producto</label>
+        <div class="img-upload-area" id="img-area">
+          <input type="file" id="f-img" accept="image/*" onchange="previewImg(this)">
+          <div id="img-preview-wrap">
+            <div class="img-ico">📷</div>
+            <div class="img-txt">Haz clic para seleccionar una foto<br><small>JPG, PNG, WEBP</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>Código / ID</label><input type="text" id="f-cod" placeholder="Ej: ATD-001"></div>
+        <div class="fg"><label>Categoría</label>
+          <select id="f-cat">
+            <option>Ataúdes de Resina</option>
+            <option>Separadores de Resina</option>
+            <option>Marcos Arcilla Fría</option>
+            <option>Historias Ilustradas</option>
+            <option>Dijes Florales</option>
+            <option>Set Peine + Espejo</option>
+            <option>Vitrales de Resina</option>
+            <option>Máscaras Arcilla Fría</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>Nombre / variante</label><input type="text" id="f-nombre" placeholder="Ej: Ataúd mediano — rosas blancas"></div>
+      <div class="fg3">
+        <div class="fg"><label>Precio ($MXN)</label><input type="number" id="f-precio" placeholder="0" min="0" step="0.50"></div>
+        <div class="fg"><label>Stock</label><input type="number" id="f-stock" placeholder="1" min="0" value="1"></div>
+        <div class="fg"><label>Estado</label>
+          <select id="f-status"><option>Disponible</option><option>Reservado</option><option>Vendido</option></select>
+        </div>
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>Flores usadas</label><input type="text" id="f-flores" placeholder="Ej: rosa, lavanda"></div>
+        <div class="fg"><label>Dimensiones</label><input type="text" id="f-dims" placeholder="Ej: 12.5 cm largo"></div>
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>Color / acabado</label><input type="text" id="f-color" placeholder="Ej: negro con dorado"></div>
+        <div class="fg"><label>Material base</label>
+          <select id="f-mat">
+            <option>Resina epoxi</option><option>Resina UV</option><option>Arcilla fría</option>
+            <option>Arcilla fría + resina</option><option>Arcilla fría + barniz</option>
+            <option>Arcilla fría + dibujo</option><option>Mixto</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>Notas</label><textarea id="f-notas" placeholder="Detalles adicionales, edición especial, etc."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="save()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DETALLE -->
+<div class="overlay" id="detail-overlay">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title" id="det-title">Detalle</span>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="modal-body" id="det-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="det-del">Eliminar</button>
+      <button class="btn btn-secondary" onclick="closeDetail()">Cerrar</button>
+      <button class="btn btn-primary" id="det-edit">Editar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DOCUMENTO -->
+<div class="overlay" id="doc-overlay">
+  <div class="modal doc-modal">
+    <div class="modal-hdr">
+      <span class="modal-title" id="doc-modal-title">Datos para la cotización</span>
+      <button class="modal-close" onclick="closeDocModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg2">
+        <div class="fg"><label>Nombre del cliente</label><input type="text" id="dc-nombre" placeholder="Ej: María González"></div>
+        <div class="fg"><label>WhatsApp / Tel</label><input type="text" id="dc-tel" placeholder="55 1234 5678"></div>
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>Fecha</label><input type="text" id="dc-fecha" placeholder="ej. 4 de abril 2026"></div>
+        <div class="fg"><label id="dc-validez-lbl">Válida hasta</label><input type="text" id="dc-validez" placeholder="ej. 11 de abril 2026"></div>
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>Cantidad</label><input type="number" id="dc-qty" value="1" min="1"></div>
+        <div class="fg"><label>Descuento %</label><input type="number" id="dc-desc" value="0" min="0" max="100"></div>
+      </div>
+      <div class="fg"><label>Notas para el cliente</label>
+        <textarea id="dc-notas" rows="2" placeholder="Ej: 50% anticipo requerido. Tiempo de elaboración: 7 días..."></textarea>
+      </div>
+      <div id="recibo-extra" style="display:none">
+        <div class="fg2">
+          <div class="fg"><label>Monto cobrado</label><input type="number" id="dc-pagado" placeholder="0.00"></div>
+          <div class="fg"><label>Forma de pago</label>
+            <select id="dc-forma"><option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option><option>PayPal</option><option>Otro</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeDocModal()">Cancelar</button>
+      <button class="btn btn-primary" id="doc-gen-btn" onclick="generateDoc()">Generar e imprimir</button>
+    </div>
+  </div>
+</div>
+
+<div id="print-doc"></div>
+
+<script>
+const DB='pm_catalogo_v2';
+const $=id=>document.getElementById(id);
+const fmt=n=>'$'+Math.round(n).toLocaleString('es-MX');
+const fmtP=n=>n?'$'+parseFloat(n).toLocaleString('es-MX',{minimumFractionDigits:0,maximumFractionDigits:0}):'—';
+
+let products=[], currentImg=null, editId=null, detailId=null, docProduct=null, docType='';
+
+const CAT_ICO={
+  'Ataúdes de Resina':'⚰️','Separadores de Resina':'🌿','Marcos Arcilla Fría':'🖼️',
+  'Historias Ilustradas':'📖','Dijes Florales':'💍','Set Peine + Espejo':'🪮',
+  'Vitrales de Resina':'🔮','Máscaras Arcilla Fría':'🎭'
+};
+
+function load(){try{products=JSON.parse(localStorage.getItem(DB))||[];}catch{products=[];}}
+function saveDB(){localStorage.setItem(DB,JSON.stringify(products));}
+function genId(){return'PM'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function hoy(){return new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});}
+function folio(){return'PM-'+Date.now().toString().slice(-6);}
+
+function badgeCls(s){return s==='Disponible'?'s-disp':s==='Reservado'?'s-res':'s-vend';}
+function ico(p){return CAT_ICO[p.categoria]||'🌸';}
+
+function imgHtml(p,cls,phSize='2.5rem'){
+  return p.img
+    ?`<img src="${p.img}" class="${cls}" alt="${p.nombre}">`
+    :`<div class="${cls}" style="display:flex;align-items:center;justify-content:center;font-size:${phSize};background:var(--obsidian);opacity:.5">${ico(p)}</div>`;
+}
+
+// ── STATS ──
+function updateStats(){
+  $('st-total').textContent=products.length;
+  $('st-disp').textContent=products.filter(p=>p.status==='Disponible').length;
+  $('st-res').textContent=products.filter(p=>p.status==='Reservado').length;
+  $('st-vend').textContent=products.filter(p=>p.status==='Vendido').length;
+}
+
+// ── FILTER ──
+function filtered(){
+  const q=$('search').value.toLowerCase().trim();
+  const cat=$('filt-cat').value;
+  const st=$('filt-status').value;
+  return products.filter(p=>{
+    const matchQ=!q||[p.nombre,p.codigo,p.categoria,p.flores,p.color,p.material,p.notas].join(' ').toLowerCase().includes(q);
+    return matchQ&&(!cat||p.categoria===cat)&&(!st||p.status===st);
+  });
+}
+
+// ── RENDER ──
+function render(){
+  updateStats();
+  const list=filtered();
+  renderGrid(list);
+  renderList(list);
+}
+
+function renderGrid(list){
+  const c=$('grid-ct');
+  if(!list.length){c.innerHTML=products.length?`<div class="empty"><div class="empty-ico">🔍</div><h3>Sin resultados</h3><p>Prueba con otra búsqueda o filtro.</p></div>`:emptyHtml();return;}
+  c.innerHTML=list.map(p=>`
+    <div class="prod-card" onclick="openDetail('${p.id}')">
+      <div class="card-img">${p.img?`<img src="${p.img}" alt="${p.nombre}">`:`<span class="cat-ico">${ico(p)}</span>`}</div>
+      <div class="card-body">
+        <div class="card-id">${p.codigo||'Sin código'}</div>
+        <div class="card-name">${p.nombre||'Sin nombre'}</div>
+        <div class="card-cat">${p.categoria||''}${p.dims?' · '+p.dims:''}</div>
+        <div class="card-footer">
+          <div class="card-price">${fmtP(p.precio)}</div>
+          <span class="sbadge ${badgeCls(p.status)}">${p.status}</span>
+        </div>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="act-btn" onclick="openEdit('${p.id}')">✏️ Editar</button>
+          <button class="act-btn del" onclick="confirmDel('${p.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderList(list){
+  const c=$('list-ct');
+  if(!list.length){c.innerHTML='';return;}
+  c.innerHTML=`<table class="list-tbl"><thead><tr>
+    <th></th><th>Código</th><th>Nombre</th><th>Categoría</th><th>Flores</th>
+    <th>Material</th><th>Dims.</th><th>Stock</th><th>Precio</th><th>Estado</th><th></th>
+  </tr></thead><tbody>${list.map(p=>`<tr>
+    <td><div class="list-thumb">${p.img?`<img src="${p.img}" alt="">`:`<span>${ico(p)}</span>`}</div></td>
+    <td style="font-size:11px;color:var(--muted);font-weight:500">${p.codigo||'—'}</td>
+    <td style="font-weight:500">${p.nombre||'—'}</td>
+    <td style="font-size:11px;color:var(--muted)">${p.categoria||'—'}</td>
+    <td style="font-size:11px">${p.flores||'—'}</td>
+    <td style="font-size:11px">${p.material||'—'}</td>
+    <td style="font-size:11px">${p.dims||'—'}</td>
+    <td style="text-align:center">${p.stock||0}</td>
+    <td style="font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--terrac2)">${fmtP(p.precio)}</td>
+    <td><span class="sbadge ${badgeCls(p.status)}">${p.status}</span></td>
+    <td><div style="display:flex;gap:4px">
+      <button class="act-btn" style="padding:4px 8px" onclick="openEdit('${p.id}')">✏️</button>
+      <button class="act-btn del" style="padding:4px 8px" onclick="confirmDel('${p.id}')">🗑️</button>
+    </div></td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+function emptyHtml(){return`<div class="empty">
+  <div class="empty-ico">🌸</div>
+  <h3>Tu catálogo está vacío</h3>
+  <p>Haz clic en <strong>"+ Agregar"</strong> para registrar<br>tu primera pieza con foto y datos.</p>
+</div>`;}
+
+function setView(v){
+  $('grid-ct').className='grid-view grid'+(v==='grid'?' active':'');
+  $('list-ct').className='list-view'+(v==='list'?' active':'');
+  $('vt-g').className='vt-btn'+(v==='grid'?' active':'');
+  $('vt-l').className='vt-btn'+(v==='list'?' active':'');
+}
+
+// ── FORM ──
+function openForm(){
+  editId=null;currentImg=null;
+  $('form-title').textContent='Agregar producto';
+  clearForm();
+  $('form-overlay').classList.add('open');
+}
+function openEdit(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  editId=id;currentImg=p.img||null;
+  $('form-title').textContent='Editar producto';
+  fillForm(p);
+  if(p.img)showPreview(p.img);
+  $('form-overlay').classList.add('open');
+  closeDetail();
+}
+function fillForm(p){
+  $('f-cod').value=p.codigo||'';
+  $('f-cat').value=p.categoria||'Ataúdes de Resina';
+  $('f-nombre').value=p.nombre||'';
+  $('f-precio').value=p.precio||'';
+  $('f-stock').value=p.stock||1;
+  $('f-status').value=p.status||'Disponible';
+  $('f-flores').value=p.flores||'';
+  $('f-dims').value=p.dims||'';
+  $('f-color').value=p.color||'';
+  $('f-mat').value=p.material||'Resina epoxi';
+  $('f-notas').value=p.notas||'';
+}
+function clearForm(){
+  ['f-cod','f-nombre','f-precio','f-flores','f-dims','f-color','f-notas'].forEach(id=>$(id).value='');
+  $('f-cat').value='Ataúdes de Resina';$('f-status').value='Disponible';
+  $('f-mat').value='Resina epoxi';$('f-stock').value=1;
+  $('img-preview-wrap').innerHTML=`<div class="img-ico">📷</div><div class="img-txt">Haz clic para seleccionar una foto<br><small>JPG, PNG, WEBP</small></div>`;
+  $('f-img').value='';
+}
+function closeForm(){$('form-overlay').classList.remove('open');editId=null;currentImg=null;}
+function save(){
+  const nombre=$('f-nombre').value.trim();
+  const codigo=$('f-cod').value.trim();
+  if(!nombre){alert('Escribe el nombre del producto.');return;}
+  if(!codigo){alert('Ingresa un código / ID.');return;}
+  const d={
+    id:editId||genId(),codigo,
+    categoria:$('f-cat').value,nombre,
+    precio:parseFloat($('f-precio').value)||0,
+    stock:parseInt($('f-stock').value)||0,
+    status:$('f-status').value,
+    flores:$('f-flores').value.trim(),
+    dims:$('f-dims').value.trim(),
+    color:$('f-color').value.trim(),
+    material:$('f-mat').value,
+    notas:$('f-notas').value.trim(),
+    img:currentImg||null,
+    updatedAt:new Date().toISOString(),
+  };
+  if(editId){const i=products.findIndex(p=>p.id===editId);if(i>=0)products[i]=d;}
+  else{d.createdAt=d.updatedAt;products.unshift(d);}
+  saveDB();closeForm();render();
+}
+
+// ── IMAGE ──
+function previewImg(input){
+  const f=input.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{currentImg=e.target.result;showPreview(currentImg);};
+  r.readAsDataURL(f);
+}
+function showPreview(src){
+  $('img-preview-wrap').innerHTML=`<img src="${src}" class="img-preview" alt="preview"><div style="font-size:11px;color:var(--muted);margin-top:3px">Clic para cambiar</div>`;
+}
+
+// ── DETAIL ──
+function openDetail(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  detailId=id;
+  $('det-title').textContent=p.nombre||'Detalle';
+  const rows=[
+    ['Código',p.codigo||'—'],['Categoría',p.categoria||'—'],
+    ['Flores',p.flores||'—'],['Material',p.material||'—'],
+    ['Dimensiones',p.dims||'—'],['Color',p.color||'—'],
+    ['Stock',p.stock||0],['Estado',p.status],
+  ];
+  $('det-body').innerHTML=`
+    ${p.img?`<img src="${p.img}" class="detail-img" alt="${p.nombre}">`:`<div class="detail-img-ph">${ico(p)}</div>`}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem">
+      <div class="detail-price">${fmtP(p.precio)}</div>
+      <span class="sbadge ${badgeCls(p.status)}" style="font-size:12px;padding:4px 11px">${p.status}</span>
+    </div>
+    <div class="detail-grid">${rows.map(([l,v])=>`<div class="detail-item"><label>${l}</label><span>${v}</span></div>`).join('')}</div>
+    ${p.notas?`<div style="background:var(--cream);border-radius:6px;padding:9px 11px;font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:.75rem"><strong style="display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink);margin-bottom:3px">Notas</strong>${p.notas}</div>`:''}
+    <div class="doc-row">
+      <button class="btn btn-dark" style="font-size:12px;padding:8px 14px" onclick="openDocModal('cotizacion','${id}')">📄 Cotización</button>
+      <button class="btn btn-green" style="font-size:12px;padding:8px 14px" onclick="openDocModal('recibo','${id}')">✅ Recibo pagado</button>
+    </div>`;
+  $('det-edit').onclick=()=>openEdit(id);
+  $('det-del').onclick=()=>confirmDel(id);
+  $('detail-overlay').classList.add('open');
+}
+function closeDetail(){$('detail-overlay').classList.remove('open');detailId=null;}
+
+// ── DELETE ──
+function confirmDel(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  if(!confirm(`¿Eliminar "${p.nombre}" (${p.codigo})?\nEsta acción no se puede deshacer.`))return;
+  products=products.filter(x=>x.id!==id);saveDB();closeDetail();render();
+}
+
+// ── DOCUMENTO ──
+function openDocModal(tipo,id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  docProduct=p;docType=tipo;
+  const esC=tipo==='cotizacion';
+  $('doc-modal-title').textContent=esC?'Datos para la cotización':'Datos para el recibo';
+  $('recibo-extra').style.display=esC?'none':'block';
+  $('dc-validez-lbl').textContent=esC?'Válida hasta':'Fecha de entrega';
+  $('doc-gen-btn').textContent=esC?'Generar cotización':'Generar recibo';
+  $('dc-fecha').value=hoy();
+  $('dc-qty').value=1;$('dc-desc').value=0;
+  if(!esC)$('dc-pagado').value=p.precio||0;
+  $('doc-overlay').classList.add('open');
+}
+function closeDocModal(){$('doc-overlay').classList.remove('open');docProduct=null;}
+$('doc-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeDocModal();});
+
+function generateDoc(){
+  const p=docProduct;if(!p)return;
+  const cliente=$('dc-nombre').value.trim()||'Cliente';
+  const tel=$('dc-tel').value.trim();
+  const fecha=$('dc-fecha').value.trim()||hoy();
+  const validez=$('dc-validez').value.trim();
+  const notas=$('dc-notas').value.trim();
+  const qty=parseInt($('dc-qty').value)||1;
+  const desc=parseFloat($('dc-desc').value)||0;
+  const esC=docType==='cotizacion';
+  const pagado=!esC?(parseFloat($('dc-pagado').value)||0):0;
+  const forma=!esC?$('dc-forma').value:'';
+  const pu=p.precio||0;
+  const sub=qty*pu*(1-desc/100);
+  const saldo=!esC?sub-pagado:0;
+  const notasDef=esC?`Cotización válida: ${validez||'7 días hábiles'}. Se requiere 50% de anticipo para iniciar producción. Pieza única hecha a mano.`:`Proyecto completado y entregado. ¡Gracias por tu confianza! 🌸`;
+  const extHtml=esC
+    ?`<div class="pd-tot"><span class="tl">Anticipo sugerido (50%)</span><span class="tv">${fmt(sub*0.5)}</span></div>
+       <div class="pd-tot"><span class="tl">Saldo al entregar</span><span class="tv">${fmt(sub*0.5)}</span></div>`
+    :`<div class="pd-tot"><span class="tl">Pagado — ${forma}</span><span class="tv">${fmt(pagado)}</span></div>
+       <div class="pd-tot"><span class="tl">Saldo pendiente</span><span class="tv" style="${saldo<=0?'color:#2E6B40;font-weight:700':''}">${saldo<=0?'✓ SALDO CERO':fmt(saldo)}</span></div>`;
+  const selloHtml=!esC&&pagado>=sub?`<div class="pd-sello-wrap"><div class="pd-sello">✓ PAGADO</div></div>`:'';
+
+  $('print-doc').innerHTML=`
+  <div class="pd-hdr">
+    <div class="pd-brand">
+      <h2>planta<span>muerta</span>.art</h2>
+      <p>Resina · Arcilla fría · Flores preservadas<br>Hecho a mano con amor 🌸</p>
+      ${tel?`<p>WhatsApp: ${tel}</p>`:''}
+    </div>
+    <div class="pd-tipo-blk">
+      <div class="pd-tipo-lbl">${esC?'Cotización':'Recibo de Pago'}</div>
+      <div class="pd-tipo-val">${esC?'Cotización':'Recibo'}</div>
+      <div class="pd-folio">Folio: ${folio()}</div>
+      <div class="pd-folio">Fecha: ${fecha}</div>
+    </div>
+  </div>
+  <div class="pd-meta">
+    <div class="pd-meta-item"><label>Cliente</label><span>${cliente}</span></div>
+    <div class="pd-meta-item"><label>Código producto</label><span>${p.codigo||'—'}</span></div>
+    ${validez?`<div class="pd-meta-item"><label>${esC?'Válida hasta':'Entrega'}</label><span>${validez}</span></div>`:''}
+    <div class="pd-meta-item"><label>Estado</label><span style="${!esC?'color:#2E6B40;font-weight:600':''}">${esC?'⏳ Pendiente':'✓ Entregado'}</span></div>
+  </div>
+  <table class="pd-tbl">
+    <thead><tr><th>Descripción</th><th style="text-align:right">Cant.</th><th style="text-align:right">P. Unit.</th><th style="text-align:right">Desc.</th><th style="text-align:right">Subtotal</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>${p.nombre}${p.dims?' — '+p.dims:''}${p.flores?' ('+p.flores+')':''}<br><span style="font-size:11px;color:#7A6A5E">${p.categoria||''}${p.material?' · '+p.material:''}</span></td>
+        <td class="nr">${qty}</td>
+        <td class="nr">${fmt(pu)}</td>
+        <td class="nr">${desc>0?desc+'%':'—'}</td>
+        <td class="nr">${fmt(sub)}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="pd-totals">
+    <div class="pd-tot"><span class="tl">Subtotal</span><span class="tv">${fmt(sub)}</span></div>
+    ${extHtml}
+    <div class="pd-tot grand"><span class="tl">TOTAL</span><span class="tv">${fmt(sub)}</span></div>
+  </div>
+  ${selloHtml}
+  <div class="pd-notas"><strong>Notas:</strong>${notas||notasDef}</div>
+  <div class="pd-footer">
+    <p><strong>plantamuerta.art</strong> — Resina · Arcilla fría · Flores preservadas</p>
+    <p>Cada pieza es única y elaborada a mano · Gracias por tu preferencia 🌸</p>
+  </div>`;
+
+  closeDocModal();
+  setTimeout(()=>window.print(),250);
+}
+
+// ── CLOSE ON BG CLICK ──
+['form-overlay','detail-overlay'].forEach(id=>{
+  $(id).addEventListener('click',e=>{if(e.target===e.currentTarget)eval('close'+id.split('-')[0].charAt(0).toUpperCase()+id.split('-')[0].slice(1)+'()')});
+});
+$('form-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeForm();});
+$('detail-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeDetail();});
+
+// ── INIT ──
+load();render();
+</script>
+</body>
+</html>
